@@ -12,6 +12,8 @@ pygame.display.set_caption("Halloween Math")
 # images
 bg = pygame.image.load('res/graveyard(1280x720).png')
 you_died_image = pygame.image.load('res/youdied.png')
+lives_image = pygame.image.load('res/live_bag.png')
+candy_path = pygame.image.load('res/candy.png')
 
 # music
 pygame.mixer.music.load('res/electro_zombies.mp3')
@@ -45,17 +47,12 @@ font = pygame.font.SysFont('comicsans', 30, True)
 # user
 user = User(83, 560, 10, 10, 'res/ghost-trick-or-treating-hi.png')
 
+#candy 
+candy = []
+
 # game state
 # TODO
 # add 5 more headstones to work as progress markers
-
-# TODO
-# 5 for now
-# if progress = 10 make it so game is over and halloween candy flies around or somthing
-
-# TODO
-# create graphics for lives
-# can use for i in lives draw(life.png) x + 50
 
 correct_to_win = 5
 
@@ -74,8 +71,9 @@ def redraw_game_window():
     if is_dead:
         draw_you_died()
     if progress == 5:
-        # TODO
-        # make screen or animation for winning
+        draw_candy()
+        win.blit(pygame.font.SysFont('comicsans', 200, True).render('YOU WIN', 1, (128,0,0)), ((window_len / 2) - (200 * 1.6), window_width / 3))
+        win.blit(pygame.font.SysFont('comicsans', 50, True).render('Happy Halloween!', 1, (255,69,0)), ((window_len / 2) - (50 * 3.5), window_width / 3 + 150))
         new_game_button.draw(win)
 
     pygame.display.update()
@@ -95,11 +93,9 @@ def draw_current_level():
 
 
 def draw_health():
-    global win, font, lives
-
-    health = font.render(f'lives: {lives} ', 1, (255, 255, 255))  # 81x21
-    pygame.draw.rect(win, (160, 160, 160), (589.5, 90, 105, 41))
-    win.blit(health, (599.5, 100))
+    global win, lives
+    for x in range(lives):
+        win.blit(lives_image, (10 + (x * 50), 10))
 
 
 def draw_question():
@@ -146,6 +142,20 @@ def advance_user():
     for i in range(20):
         user.x += 10.25
         redraw_game_window()
+
+def draw_candy():
+    global win
+    if not candy:
+        for i in range(1000):
+            x = window_len / 2
+            y = window_width
+            speed = random.randint(150,300)*0.1
+            angle = random.randint(0,180)
+            candy.append(Candy(x, y, speed, angle, candy_path))
+    for sweet in candy:
+        sweet.move(window_len, window_width)
+        sweet.draw(win)
+
 
 ## Event handlers ##
 
@@ -257,5 +267,6 @@ while 1:
     while is_dead:
         for event in pygame.event.get():
             done = handle_mousebuttondown_event(event, 'died', done)
+            
 
     redraw_game_window()

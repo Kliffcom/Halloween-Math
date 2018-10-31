@@ -1,7 +1,7 @@
 import random
 import operator
 import pygame
-
+import math
 
 def generate_nums(difficulty):
     ops = ['+', '-', '*']
@@ -79,3 +79,25 @@ def get_click(button):
             if button.is_over(pos):
                 lives = 3
                 dead = False
+
+class Candy:
+    def __init__(self, x, y, speed, angle, image):
+        self.x = x
+        self.y = y
+        self.speed = speed
+        self.angle = angle
+        self.image = image
+
+    def move(self, max_width, max_height):
+        """ Update speed and position based on speed, angle """
+        # for constant change in position values.
+        if self.x > max_width or self.x < 0 or self.y > max_height or self.y < 0:
+            self.speed *= -1
+            self.angle = random.randint(0,360)
+
+        self.x += math.sin(self.angle) * self.speed
+        self.y -= math.cos(self.angle) * self.speed
+
+    def draw(self, win):
+        """ Draw the particle on screen"""
+        win.blit(self.image, (self.x, self.y))
